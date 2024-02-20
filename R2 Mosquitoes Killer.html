@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oscilador de 2300Hz con Armónicos</title>
+</head>
+<body>
+
+<button id="toggleButton">Encender / Apagar</button>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Función para generar el oscilador
+        function createOscillator(context, frequency) {
+            var oscillator = context.createOscillator();
+            oscillator.type = 'sine'; // Puedes experimentar con otros tipos de onda como 'sine', 'square', 'sawtooth', 'triangle'
+            oscillator.frequency.setValueAtTime(frequency, context.currentTime);
+            oscillator.connect(context.destination);
+            return oscillator;
+        }
+
+        // Crear el contexto de audio
+        var audioContext = new (window.AudioContext || window.webkitAudioContext)();
+        
+        // Variables para controlar el estado del oscilador
+        var isOscillatorOn = false;
+        var mainOscillator, harmonic1, harmonic2;
+
+        // Función para encender y apagar el oscilador
+        function toggleOscillator() {
+            if (isOscillatorOn) {
+                mainOscillator.stop();
+                harmonic1.stop();
+                harmonic2.stop();
+            } else {
+                // Frecuencia base de 2300Hz
+                var baseFrequency = 2300;
+
+                // Crear oscilador principal
+                mainOscillator = createOscillator(audioContext, baseFrequency);
+                mainOscillator.start();
+
+                // Armónicos: +7% y -7% de la frecuencia base
+                harmonic1 = createOscillator(audioContext, baseFrequency * 1.07);
+                harmonic2 = createOscillator(audioContext, baseFrequency * 0.93);
+
+                // Iniciar armónicos
+                harmonic1.start();
+                harmonic2.start();
+            }
+
+            // Cambiar el estado del oscilador
+            isOscillatorOn = !isOscillatorOn;
+        }
+
+        // Agregar evento de clic al botón
+        var toggleButton = document.getElementById('toggleButton');
+        toggleButton.addEventListener('click', toggleOscillator);
+    });
+</script>
+
+</body>
+</html>
